@@ -1,9 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 
-namespace Konnect.Main.Extensions
+namespace Konnect.Framework.Extensions
 {
-    internal static class PointExtensions
+    public static class PointExtensions
     {
         public static double AngleBetween(this Point origin, Point target)
         {
