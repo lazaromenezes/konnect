@@ -1,4 +1,5 @@
-﻿using Konnect.Main.Components;
+﻿using Konnect.Framework;
+using Konnect.Main.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -53,7 +54,7 @@ namespace Konnect.Main
             if (IsExitInput())
                 Exit();
 
-            MouseEvent.Update(gameTime);
+            MouseEvents.Update(gameTime);
             
             base.Update(gameTime);
         }

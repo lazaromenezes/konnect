@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Konnect.Framework;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
 namespace Konnect.Main.Components
@@ -24,7 +25,7 @@ namespace Konnect.Main.Components
         public Dot(int index)
         {
             Index = index;
-            MouseEvent.JustPressed += OnMouseJustPressed;
+            MouseEvents.JustPressed += OnMouseJustPressed;
         }
 
         private bool WasClicked(Point mousePosition)
