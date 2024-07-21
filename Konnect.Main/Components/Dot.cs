@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
-namespace Konnect.Main.Components.Dot
+namespace Konnect.Main.Components
 {
     internal class Dot
     {
@@ -9,14 +9,17 @@ namespace Konnect.Main.Components.Dot
 
         public int Index { get; private set; }
         public Point Position { get; set; }
-        public Color Color => Marked ? Color.PaleTurquoise : Color.White;
-
-        public static Point Size => new(TILE_SIZE, TILE_SIZE);
-        public Rectangle Rectangle => new(Position, Size);
+        public bool Marked { get; set; }
 
         public List<Dot> Connections { get; private set; } = [];
 
-        public bool Marked;
+        public delegate void DotMarkHandler(Dot dot);
+        public event DotMarkHandler DotMarked;
+        public event DotMarkHandler DotUnmarked;
+
+        public Color Color => Marked ? Color.PaleTurquoise : Color.White;
+        public static Point Size => new(TILE_SIZE, TILE_SIZE);
+        public Rectangle Rectangle => new(Position, Size);
 
         public Dot(int index)
         {
@@ -34,6 +37,14 @@ namespace Konnect.Main.Components.Dot
             if (WasClicked(mousePosition))
             {
                 Marked = !Marked;
+                if (Marked)
+                {
+                    DotMarked.Invoke(this);
+                }
+                else
+                {
+                    DotUnmarked.Invoke(this);
+                }
             }
         }
     }

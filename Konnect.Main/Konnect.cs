@@ -1,10 +1,7 @@
 ﻿using Konnect.Main.Components;
-using Konnect.Main.Components.Dot;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Konnect.Main
 {
@@ -12,15 +9,16 @@ namespace Konnect.Main
     {
         const int DOT_COUNT = 11;
 
-        private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
-        private Texture2D _backgroundTile;
-        private Texture2D _barrelTile;
+        GraphicsDeviceManager _graphics;
+        SpriteBatch _spriteBatch;
+        Texture2D _backgroundTile;
+        Texture2D _barrelTile;
+        Texture2D _wallTile;
 
         const int Y_OFFSET = 40;
         const int X_OFFSET = 40;
 
-        private readonly List<List<Dot>> dots = new(DOT_COUNT * DOT_COUNT);
+        Board _board;
         
         public Konnect()
         {
@@ -36,14 +34,7 @@ namespace Konnect.Main
 
         protected override void Initialize()
         {
-            for (var i = 0; i < DOT_COUNT; i++)
-            {
-                dots.Add([]);
-                for (var j = 0; j < DOT_COUNT; j++)
-                {
-                    dots[i].Add(new Dot(i * DOT_COUNT + j));
-                }
-            }
+            _board = new Board(DOT_COUNT);
 
             base.Initialize();
         }
@@ -54,6 +45,7 @@ namespace Konnect.Main
 
             _backgroundTile = Content.Load<Texture2D>("tile");
             _barrelTile = Content.Load<Texture2D>("barrel");
+            _wallTile = Content.Load<Texture2D>("wall");
         }
 
         protected override void Update(GameTime gameTime)
@@ -73,24 +65,16 @@ namespace Konnect.Main
             _spriteBatch.Begin();
 
             DrawBaseBackground();
-            DrawDots();
+            DrawBoard();
 
             _spriteBatch.End();
 
             base.Draw(gameTime);
         }
 
-        private void DrawDots()
+        private void DrawBoard()
         {
-            foreach (var dot in dots.SelectMany(d => d))
-            {
-                var x = X_OFFSET + (dot.Index / DOT_COUNT) * Dot.Size.X - Dot.Size.X / 2;
-                var y = Y_OFFSET + (dot.Index % DOT_COUNT) * Dot.Size.Y - Dot.Size.Y / 2;
-
-                dot.Position = new Point(x, y);
-
-                _spriteBatch.Draw(_barrelTile, dot.Rectangle, dot.Color);
-            }
+            _board.Draw(_spriteBatch, _barrelTile, _wallTile, new Vector2(X_OFFSET, Y_OFFSET));
         }
 
         private void DrawBaseBackground()
