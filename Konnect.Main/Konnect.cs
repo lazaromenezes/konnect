@@ -1,8 +1,8 @@
-﻿using Konnect.Main.Components.Dot;
+﻿using Konnect.Main.Components;
+using Konnect.Main.Components.Dot;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -61,8 +61,8 @@ namespace Konnect.Main
             if (IsExitInput())
                 Exit();
 
-            HandleDotClick();
-
+            MouseEvent.Update(gameTime);
+            
             base.Update(gameTime);
         }
 
@@ -72,13 +72,16 @@ namespace Konnect.Main
 
             _spriteBatch.Begin();
 
-            for (int i = 0; i < 10; i++) {
-                for (int j = 0; j < 10; j++) {
-                    var position = new Vector2(X_OFFSET + i * _backgroundTile.Width, Y_OFFSET + j * _backgroundTile.Height);
-                    _spriteBatch.Draw(_backgroundTile, position, null, Color.White);
-                }
-            }
+            DrawBaseBackground();
+            DrawDots();
 
+            _spriteBatch.End();
+
+            base.Draw(gameTime);
+        }
+
+        private void DrawDots()
+        {
             foreach (var dot in dots.SelectMany(d => d))
             {
                 var x = X_OFFSET + (dot.Index / DOT_COUNT) * Dot.Size.X - Dot.Size.X / 2;
@@ -88,25 +91,23 @@ namespace Konnect.Main
 
                 _spriteBatch.Draw(_barrelTile, dot.Rectangle, dot.Color);
             }
+        }
 
-            _spriteBatch.End();
-
-            base.Draw(gameTime);
+        private void DrawBaseBackground()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    var position = new Vector2(X_OFFSET + i * _backgroundTile.Width, Y_OFFSET + j * _backgroundTile.Height);
+                    _spriteBatch.Draw(_backgroundTile, position, null, Color.White);
+                }
+            }
         }
 
         private static bool IsExitInput()
         {
             return GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape);
-        }
-
-        private void HandleDotClick()
-        {
-            var clickedDot = dots.SelectMany(d => d).SingleOrDefault(d => d.Rectangle.Contains(Mouse.GetState().Position));
-
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed && clickedDot != null)
-            {
-                clickedDot.Color = Color.PowderBlue;
-            }
         }
     }
 }
