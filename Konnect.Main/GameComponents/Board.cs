@@ -1,12 +1,13 @@
 ﻿using Konnect.Framework.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Konnect.Main.GameComponents
 {
-    internal class Board : DrawableGameComponent
+    internal class Board(Game game) : DrawableGameComponent(game)
     {
         const int Y_OFFSET = 40;
         const int X_OFFSET = 40;
@@ -16,19 +17,17 @@ namespace Konnect.Main.GameComponents
 
         readonly List<List<Dot>> _dots = [];
         readonly List<List<Room>> _rooms = [];
-
-        readonly SpriteBatch _spriteBatch;
+        readonly SpriteBatch _spriteBatch = game.Services.GetService<SpriteBatch>();
 
         Dot currentDot;
 
         Texture2D _dotSprite, _wallSprite, _tileSprite;
 
-        public Board(Game game) : base(game)
+        public override void Initialize()
         {
-            _spriteBatch = game.Services.GetService<SpriteBatch>();
-            
             InitializeRooms();
             InitializeDots();
+            base.Initialize();
         }
 
         private void InitializeDots()
@@ -152,16 +151,22 @@ namespace Konnect.Main.GameComponents
             {
                 currentDot = dot;
             }
-            else
+            else 
             {
-                if (currentDot != dot)
-                {
+                if (CanConnectTo(dot)) 
                     currentDot.Connections.Add(dot);
-                    currentDot.Marked = false;
-                    dot.Marked = false;
-                    currentDot = null;
-                }
+
+                currentDot.Marked = false;
+                dot.Marked = false;
+                currentDot = null;
             }
+        }
+
+        private bool CanConnectTo(Dot dot)
+        {
+            var connectionExists = currentDot.Connections.Contains(dot) || dot.Connections.Contains(currentDot);
+
+            return currentDot != dot && dot.IsAdjacent(currentDot) && !connectionExists;
         }
 
         private void OnDotUnmarked(Dot dot)

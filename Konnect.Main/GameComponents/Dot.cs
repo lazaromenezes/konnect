@@ -1,5 +1,6 @@
 ﻿using Konnect.Framework;
 using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 
 namespace Konnect.Main.GameComponents
@@ -26,6 +27,11 @@ namespace Konnect.Main.GameComponents
         {
             Index = index;
             MouseEvents.JustPressed += OnMouseJustPressed;
+        }
+
+        public bool IsAdjacent(Dot other)
+        {
+            return Math.Abs(Position.X - other.Position.X + Position.Y - other.Position.Y) == TILE_SIZE;
         }
 
         private bool WasClicked(Point mousePosition)
