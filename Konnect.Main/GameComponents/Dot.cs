@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
-namespace Konnect.Main.Components
+namespace Konnect.Main.GameComponents
 {
     internal class Dot
     {

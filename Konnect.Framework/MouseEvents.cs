@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Konnect.Framework
 {
-    public static class MouseEvents
+    public class MouseEvents(Game game) : GameComponent(game)
     {
         public delegate void OnJustPressed(Point position);
 
@@ -13,7 +13,7 @@ namespace Konnect.Framework
 
         static ButtonState LeftButtonState => Mouse.GetState().LeftButton;
 
-        public static void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
             if (LeftButtonState == ButtonState.Pressed && _previousState == ButtonState.Released)
             {
