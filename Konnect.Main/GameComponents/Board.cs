@@ -11,8 +11,12 @@ namespace Konnect.Main.GameComponents
         const int Y_OFFSET = 40;
         const int X_OFFSET = 40;
 
+        const int ROOM_COUNT = 10;
+        const int DOT_COUNT = ROOM_COUNT + 1;
+
         readonly List<List<Dot>> _dots = [];
-        readonly int _boardSize;
+        readonly List<List<Room>> _rooms = [];
+
         readonly SpriteBatch _spriteBatch;
 
         Dot currentDot;
@@ -22,20 +26,64 @@ namespace Konnect.Main.GameComponents
         public Board(Game game) : base(game)
         {
             _spriteBatch = game.Services.GetService<SpriteBatch>();
+            
+            InitializeRooms();
+            InitializeDots();
+        }
 
-            _boardSize = 11;
-
-            for (var i = 0; i < _boardSize; i++)
+        private void InitializeDots()
+        {
+            for (var row = 0; row < DOT_COUNT; row++)
             {
                 _dots.Add([]);
-                for (var j = 0; j < _boardSize; j++)
+                for (var column = 0; column < DOT_COUNT; column++)
                 {
-                    var dot = new Dot(i * _boardSize + j);
-                    dot.DotMarked += OnDotMarked;
-                    dot.DotUnmarked += OnDotUnmarked;
-                    _dots[i].Add(dot);
+                    AddDotAt(row, column);
                 }
             }
+        }
+
+        private void InitializeRooms()
+        {
+            for (var row = 0; row < ROOM_COUNT; row++)
+            {
+                _rooms.Add([]);
+                for (var column = 0; column < ROOM_COUNT; column++)
+                {
+                    AddRoomAt(row, column);
+                }
+            }
+        }
+
+        private void AddDotAt(int row, int column)
+        {
+            var index = row * DOT_COUNT + column;
+
+            var dot = new Dot(index);
+
+            dot.DotMarked += OnDotMarked;
+            dot.DotUnmarked += OnDotUnmarked;
+
+            var x = X_OFFSET + column * Dot.Size.X - Dot.Size.X / 2;
+            var y = Y_OFFSET + row * Dot.Size.Y - Dot.Size.Y / 2;
+
+            dot.Position = new Point(x, y);
+         
+            _dots[row].Add(dot);
+        }
+
+        private void AddRoomAt(int row, int column)
+        {
+            var index = row * ROOM_COUNT + column;
+
+            var room = new Room(index);
+
+            var x = X_OFFSET + column * Room.Size.X;
+            var y = Y_OFFSET + row * Room.Size.Y;
+
+            room.Position = new Point(x, y);
+
+            _rooms[row].Add(room);
         }
 
         protected override void LoadContent()
@@ -47,21 +95,19 @@ namespace Konnect.Main.GameComponents
 
         public override void Draw(GameTime gameTime)
         {
-            DrawBaseBackground();
+            DrawRooms();
             DrawConnections();
             DrawDots();
         }
 
         private void DrawDots()
         {
-            foreach (var dot in _dots.SelectMany(d => d))
+            foreach(var dotRow in _dots)
             {
-                var x = X_OFFSET + dot.Index / _boardSize * Dot.Size.X - Dot.Size.X / 2;
-                var y = Y_OFFSET + dot.Index % _boardSize * Dot.Size.Y - Dot.Size.Y / 2;
-
-                dot.Position = new Point(x, y);
-
-                _spriteBatch.Draw(_dotSprite, dot.Rectangle, dot.Color);
+                foreach (var dot in dotRow)
+                {
+                    _spriteBatch.Draw(_dotSprite, dot.Rectangle, dot.Color);
+                }
             }
         }
 
@@ -82,19 +128,20 @@ namespace Konnect.Main.GameComponents
                         Y = origin.Y + Dot.Size.Y / 2 + (angle != 0 ? 11 : -11)
                     };
 
-                    _spriteBatch.Draw(_wallSprite, drawOrigin, new Rectangle(1, 1, 62, 22), Color.White, (float)angle, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+                    _spriteBatch.Draw(_wallSprite, drawOrigin, ConnectionDrawRectangle, Color.White, (float)angle, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
                 }
             }
         }
+        
+        static Rectangle ConnectionDrawRectangle => new(1, 1, 62, 22);
 
-        private void DrawBaseBackground()
+        private void DrawRooms()
         {
-            for (int i = 0; i < 10; i++)
+            foreach (var roomRow in _rooms)
             {
-                for (int j = 0; j < 10; j++)
+                foreach (var room in roomRow)
                 {
-                    var position = new Vector2(X_OFFSET + i * _tileSprite.Width, Y_OFFSET + j * _tileSprite.Height);
-                    _spriteBatch.Draw(_tileSprite, position, null, Color.White);
+                    _spriteBatch.Draw(_tileSprite, room.Rectangle, room.Color);
                 }
             }
         }

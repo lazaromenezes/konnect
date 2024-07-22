@@ -2,9 +2,16 @@
 
 namespace Konnect.Main.GameComponents
 {
-    internal class Room
+    internal class Room(int index)
     {
-        public int Index { get; private set; }
+        private const int TILE_SIZE = 64;
+
+        public int Index { get; private set; } = index;
         public Point Position { get; set; }
+
+        public Color Color => Color.White;
+        public static Point Size => new(TILE_SIZE, TILE_SIZE);
+        public Rectangle Rectangle => new(Position, Size);
+
     }
 }
