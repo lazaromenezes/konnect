@@ -1,7 +1,6 @@
 ﻿using Konnect.Framework.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,7 +20,7 @@ namespace Konnect.Main.GameComponents
 
         Dot currentDot;
 
-        Texture2D _dotSprite, _wallSprite, _tileSprite;
+        Texture2D _dotSprite, _connectionSprite, _tileSprite;
 
         public override void Initialize()
         {
@@ -88,7 +87,7 @@ namespace Konnect.Main.GameComponents
         protected override void LoadContent()
         {
             _dotSprite = Game.Content.Load<Texture2D>("barrel");
-            _wallSprite = Game.Content.Load<Texture2D>("wall");
+            _connectionSprite = Game.Content.Load<Texture2D>("wall");
             _tileSprite = Game.Content.Load<Texture2D>("tile");
         }
 
@@ -127,7 +126,7 @@ namespace Konnect.Main.GameComponents
                         Y = origin.Y + Dot.Size.Y / 2 + (angle != 0 ? 11 : -11)
                     };
 
-                    _spriteBatch.Draw(_wallSprite, drawOrigin, ConnectionDrawRectangle, Color.White, (float)angle, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+                    _spriteBatch.Draw(_connectionSprite, drawOrigin, ConnectionDrawRectangle, Color.White, (float)angle, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
                 }
             }
         }
@@ -153,8 +152,12 @@ namespace Konnect.Main.GameComponents
             }
             else 
             {
-                if (CanConnectTo(dot)) 
+                if (CanConnectTo(dot))
+                {
                     currentDot.Connections.Add(dot);
+                    dot.Connections.Add(currentDot);
+                    CheckRooms();
+                }
 
                 currentDot.Marked = false;
                 dot.Marked = false;
@@ -167,6 +170,25 @@ namespace Konnect.Main.GameComponents
             var connectionExists = currentDot.Connections.Contains(dot) || dot.Connections.Contains(currentDot);
 
             return currentDot != dot && dot.IsAdjacent(currentDot) && !connectionExists;
+        }
+
+        private void CheckRooms()
+        {
+            for (int i = 0; i < ROOM_COUNT; i++)
+            {
+                for(int j = 0; j < ROOM_COUNT; j++)
+                {
+                    var topLeftDot = _dots[i][j];
+                    var topRightDot = _dots[i][j + 1];
+                    var bottomRightDot = _dots[i + 1][j + 1];
+                    var bottomLeftDot = _dots[i + 1][j];
+
+                    var closed = topLeftDot.Connections.Contains(topRightDot) && topRightDot.Connections.Contains(bottomRightDot)
+                        && bottomRightDot.Connections.Contains(bottomLeftDot) && bottomLeftDot.Connections.Contains(topLeftDot);
+
+                    _rooms[i][j].Closed = closed;
+                }
+            }
         }
 
         private void OnDotUnmarked(Dot dot)
