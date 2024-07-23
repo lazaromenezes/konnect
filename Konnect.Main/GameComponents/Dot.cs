@@ -34,6 +34,11 @@ namespace Konnect.Main.GameComponents
             return Math.Abs(Position.X - other.Position.X + Position.Y - other.Position.Y) == TILE_SIZE;
         }
 
+        public bool HasConnectionTo(Dot other)
+        {
+            return Connections.Contains(other);
+        }
+
         private bool WasClicked(Point mousePosition)
         {
             return Rectangle.Contains(mousePosition);

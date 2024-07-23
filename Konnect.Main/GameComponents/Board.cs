@@ -183,8 +183,8 @@ namespace Konnect.Main.GameComponents
                     var bottomRightDot = _dots[i + 1][j + 1];
                     var bottomLeftDot = _dots[i + 1][j];
 
-                    var closed = topLeftDot.Connections.Contains(topRightDot) && topRightDot.Connections.Contains(bottomRightDot)
-                        && bottomRightDot.Connections.Contains(bottomLeftDot) && bottomLeftDot.Connections.Contains(topLeftDot);
+                    var closed = topLeftDot.HasConnectionTo(topRightDot) && topRightDot.HasConnectionTo(bottomRightDot)
+                        && bottomRightDot.HasConnectionTo(bottomLeftDot) && bottomLeftDot.HasConnectionTo(topLeftDot);
 
                     _rooms[i][j].Closed = closed;
                 }
